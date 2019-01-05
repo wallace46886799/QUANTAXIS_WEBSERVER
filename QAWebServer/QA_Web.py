@@ -41,11 +41,13 @@ from QAWebServer.strategyhandlers import BacktestHandler, StrategyHandler
 from QAWebServer.tradehandles import AccModelHandler, TradeInfoHandler
 from QAWebServer.userhandles import (PersonBlockHandler, SigninHandler,
                                      SignupHandler)
-
+from QAWebServer.backtesthandles import (BacktestInfoHandler, BacktestInfoCodeHandler)
+from QAWebServer.stockhandles import (StockFavHandler, StockPEPBHandler, StockBasicHandler, StockListHandler, StockReportingHandler, StockDividendHandler, StockRoeHandler)
 from QAWebServer.jobhandler import JOBHandler
 from tornado_http2.server import Server
 from QUANTAXIS.QAUtil.QASetting import QASETTING
 from terminado import TermSocket, SingleTermManager
+
 
 class INDEX(QABaseHandler):
     def get(self):
@@ -60,6 +62,14 @@ handlers = [
     # (r"/websocket", TermSocket, {'term_manager': term_manager}),
     # (r"/()", tornado.web.StaticFileHandler, {'path':'index.html'}),
     # (r"/(.*)", tornado.web.StaticFileHandler, {'path':'.'}),
+    (r"/stocklist", StockListHandler),
+    (r"/stockbasic", StockBasicHandler),
+    (r"/stockdividend", StockDividendHandler),
+    (r"/stockreporting", StockReportingHandler),
+    (r"/stockroe", StockRoeHandler),
+    (r"/pepb", StockPEPBHandler),
+    (r"/stockfav", StockFavHandler),
+
     (r"/marketdata/stock/day", StockdayHandler),
     (r"/marketdata/stock/min", StockminHandler),
     (r"/marketdata/stock/block", StockBlockHandler),
@@ -69,6 +79,8 @@ handlers = [
     (r"/user/signup", SignupHandler),
     (r"/user/blocksetting", PersonBlockHandler),
     (r"/strategy/content", StrategyHandler),
+    (r"/backtest/info", BacktestInfoHandler),
+    (r"/backtest/info_code", BacktestInfoCodeHandler),
     (r"/backtest/content", BacktestHandler),
     (r"/trade", AccModelHandler),
     (r"/tradeinfo", TradeInfoHandler),
@@ -87,7 +99,6 @@ handlers = [
 def main():
 
     define("port", default=8010, type=int, help="服务器监听端口号")
-
     define("address", default='0.0.0.0', type=str, help='服务器地址')
     define("content", default=[], type=str, multiple=True, help="控制台输出内容")
     parse_command_line()
@@ -95,7 +106,7 @@ def main():
         handlers=handlers,
         debug=True,
         autoreload=True,
-        compress_response= True
+        compress_response=True
     )
 
     try:
@@ -112,9 +123,9 @@ def main():
                              default_value=options.port)
 
     # print(options.content)
-    #http_server = tornado.httpserver.HTTPServer(apps)
+    # http_server = tornado.httpserver.HTTPServer(apps)
     http_server = Server(apps)
-    print(port)
+    print('QUANTAXIS_WEBSERVER listening on: ' + port)
     http_server.bind(port, address=options.address)
     """增加了对于非windows下的机器多进程的支持
     """

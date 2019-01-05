@@ -37,6 +37,7 @@ from QUANTAXIS.QAUtil.QASetting import DATABASE
 from QUANTAXIS.QAUtil.QASql import QA_util_sql_mongo_setting
 from QAWebServer.basehandles import QABaseHandler,QAWebSocketHandler
 
+from QUANTAXIS.QAFetch.QAQuery import (QA_fetch_backtest_history, QA_fetch_backtest_info)
 
 """
 希望做成可以api连接的网页版回测接口
@@ -59,3 +60,35 @@ class BacktestHandler(QAWebSocketHandler):
 
     def on_close(self):
         print('connection close')
+
+
+class BacktestInfoHandler(QABaseHandler):
+    def get(self):
+        """[summary]
+
+        Arguments:
+            QABaseHandler {[type]} -- [description]
+        """
+        user_name = self.get_argument('name', 'all')
+        backtest_history = QA_fetch_backtest_info(user=user_name)
+
+        if len(backtest_history) > 0:
+            self.write({'result': backtest_history})
+        else:
+            self.write('wrong')
+
+
+class BacktestInfoCodeHandler(QABaseHandler):
+    def get(self):
+        """[summary]
+
+        Arguments:
+            QABaseHandler {[type]} -- [description]
+        """
+        stock_code = self.get_argument('code', 'all')
+        backtest_history = QA_fetch_backtest_info(stock_list=stock_code)
+
+        if len(backtest_history) > 0:
+            self.write({'result': backtest_history})
+        else:
+            self.write('wrong')

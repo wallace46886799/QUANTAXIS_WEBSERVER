@@ -2,6 +2,8 @@ import datetime
 import json
 import sys
 from datetime import date
+import time
+
 
 APPLICATION_JSON = 'application/json'
 APPLICATION_XML = 'application/xml'
@@ -37,8 +39,38 @@ def convert(value, type):
         return value
 
 
-class CJsonEncoder(json.JSONEncoder):
+def report_dates(start_year=2000):
+    from datetime import datetime
+    end_year = datetime.now().year
+    rds = []
+    for year in range(start_year, end_year):
+        rds.append(datetime(year, 3, 31, 0, 0, 0).strftime('%Y-%m-%d'))
+        rds.append(datetime(year, 6, 30, 0, 0, 0).strftime('%Y-%m-%d'))
+        rds.append(datetime(year, 9, 30, 0, 0, 0).strftime('%Y-%m-%d'))
+        rds.append(datetime(year, 12, 31, 0, 0, 0).strftime('%Y-%m-%d'))
+    return rds
 
+
+def format_ts_datetime(ts):
+    dt = ts.strftime("%Y-%m-%d %H:%M:%S")
+    return dt
+
+
+def format_ts_date(ts):
+    dt = ts.strftime("%Y-%m-%d")
+    return dt
+
+
+def format_number(number):
+    return round(number, 2)
+
+
+def format_percent(percent):
+    dt = '%.2f%%' % percent
+    return dt
+
+
+class CJsonEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, datetime.datetime):
             return obj.strftime('%Y-%m-%d %H:%M:%S')
@@ -46,3 +78,7 @@ class CJsonEncoder(json.JSONEncoder):
             return obj.strftime('%Y-%m-%d')
         else:
             return json.JSONEncoder.default(self, obj)
+
+if __name__ == '__main__':
+    print(report_dates())
+    print(format_percent(5.4910001755))
